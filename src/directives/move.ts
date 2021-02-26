@@ -4,8 +4,7 @@ export function movable(el: HTMLElement, selector?: string) {
   const target = getTarget(el, selector);
   target.addEventListener(
     'mousedown',
-    // @ts-ignore
-    (target.__movable__ = ({ x: startX, y: startY }: MouseEvent) => {
+    ({ x: startX, y: startY }: MouseEvent) => {
       const oldTransition = el.style.transition;
       el.style.transition = 'none';
 
@@ -24,19 +23,8 @@ export function movable(el: HTMLElement, selector?: string) {
       };
       document.addEventListener('mouseup', mouseupListener, true);
       document.addEventListener('mousemove', mousemoveListener, true);
-    })
+    }
   );
-}
-
-export function unMovable(el: HTMLElement, selector?: string) {
-  const target = getTarget(el, selector);
-  // @ts-ignore
-  if (target && target.__movable__) {
-    // @ts-ignore
-    target.removeEventListener('mousedown', target.__movable__);
-    // @ts-ignore
-    delete target.__movable__;
-  }
 }
 
 function getTranslateCoordinate(translate: string): [number, number] {
