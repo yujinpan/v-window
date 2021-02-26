@@ -10,7 +10,16 @@
       <el-col class="cm-text-left" :span="12">
         <div>
           <label>Function 1:</label>
-          <HelloWorld />
+          <el-dialog
+            :visible="true"
+            v-window
+            window-header=".el-dialog__header"
+            window-resize=".el-dialog"
+          >
+            <h1>Title</h1>
+            <h2>Description</h2>
+            <h3>Content</h3>
+          </el-dialog>
         </div>
         <el-divider></el-divider>
         <el-link
@@ -24,14 +33,14 @@
 </template>
 
 <script>
-import HelloWorld from '../src';
+import Window from '../src/directives/window';
 import '@/element-ui.ts';
 
 const version = require('../package').version;
 
 export default {
-  components: {
-    HelloWorld
+  directives: {
+    Window
   },
   data() {
     return {
