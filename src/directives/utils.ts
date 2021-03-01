@@ -31,7 +31,7 @@ export function draggable(
   onEnd?: Function
 ): Function {
   const listener = (e: MouseEvent) => {
-    if (canDrag(e)) {
+    if (e.button === 0 && canDrag(e)) {
       onStart();
       document.body.style.userSelect = 'none';
       const { x: startX, y: startY } = e;
