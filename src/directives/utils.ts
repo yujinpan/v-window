@@ -24,24 +24,40 @@ export function getTarget(el: HTMLElement, selector?: string): HTMLElement {
 }
 
 export function draggable(
-  el: HTMLElement,
-  onStart: () => void,
+  el: HTMLElement | Document,
+  canDrag: (e: MouseEvent) => boolean,
+  onStart: Function,
   onMove: (x: number, y: number) => void,
-  onEnd: () => void
+  onEnd?: Function
 ): Function {
-  const listener = ({ x: startX, y: startY }: MouseEvent) => {
-    onStart();
-    const mousemoveListener = throttle(({ x: endX, y: endY }: MouseEvent) =>
-      onMove(endX - startX, endY - startY)
-    );
-    const mouseupListener = () => {
-      onEnd();
-      document.removeEventListener('mouseup', mouseupListener, true);
-      document.removeEventListener('mousemove', mousemoveListener, true);
-    };
-    document.addEventListener('mouseup', mouseupListener, true);
-    document.addEventListener('mousemove', mousemoveListener, true);
+  const listener = (e: MouseEvent) => {
+    if (canDrag(e)) {
+      onStart();
+      document.body.style.userSelect = 'none';
+      const { x: startX, y: startY } = e;
+      const mousemoveListener = throttle(({ x: endX, y: endY }: MouseEvent) =>
+        onMove(endX - startX, endY - startY)
+      );
+      const mouseupListener = () => {
+        onEnd && onEnd();
+        document.body.style.userSelect = '';
+        document.removeEventListener('mouseup', mouseupListener, true);
+        document.removeEventListener('mousemove', mousemoveListener, true);
+      };
+      document.addEventListener('mouseup', mouseupListener, true);
+      document.addEventListener('mousemove', mousemoveListener, true);
+    }
   };
-  el.addEventListener('mousedown', listener);
-  return () => el.removeEventListener('mousedown', listener);
+  (el as HTMLElement).addEventListener('mousedown', listener);
+  return () => (el as HTMLElement).removeEventListener('mousedown', listener);
+}
+
+export function getTranslateCoordinate(el: HTMLElement): [number, number] {
+  const transform = el.style.transform;
+  const match = transform.includes('translate') && transform.match(/-?\d+/g);
+  return match ? (match.map((item) => +item) as [number, number]) : [0, 0];
+}
+
+export function setTranslate(el: HTMLElement, x: number, y: number) {
+  el.style.transform = `translate(${x}px, ${y}px)`;
 }

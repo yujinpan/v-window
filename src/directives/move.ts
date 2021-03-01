@@ -1,33 +1,39 @@
-import { draggable, getTarget } from '@/directives/utils';
+import {
+  draggable,
+  getTarget,
+  getTranslateCoordinate,
+  setTranslate
+} from '@/directives/utils';
 
-export function movable(el: HTMLElement, selector?: string) {
-  const target = getTarget(el, selector);
-  let oldTransition: string;
+export function movable(
+  el: HTMLElement,
+  {
+    headerSelector,
+    canMove,
+    onStart,
+    onEnd
+  }: {
+    headerSelector?: string;
+    canMove?: () => boolean;
+    onStart?: Function;
+    onEnd?: Function;
+  } = {}
+) {
+  const target = getTarget(el, headerSelector);
   let initX: number;
   let initY: number;
   draggable(
     target,
+    () => (canMove ? canMove() : true),
     () => {
-      oldTransition = el.style.transition;
-      el.style.transition = 'none';
-      const [x, y] = getTranslateCoordinate(el.style.transform);
+      const [x, y] = getTranslateCoordinate(el);
       initX = x;
       initY = y;
+      onStart && onStart();
     },
     (x, y) => {
-      el.style.transform = `translate(${x + initX}px, ${y + initY}px)`;
+      setTranslate(el, x + initX, y + initY);
     },
-    () => {
-      el.style.transition = oldTransition;
-    }
+    onEnd
   );
-}
-
-function getTranslateCoordinate(translate: string): [number, number] {
-  return translate.includes('translate')
-    ? (translate
-        .replace(/translate\((-?\d+)px,\s?(-?\d+)px\)/, '$1,$2')
-        .split(',')
-        .map((item) => +item) as [number, number])
-    : [0, 0];
 }

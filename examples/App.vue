@@ -12,13 +12,15 @@
           <label>Function 1:</label>
           <el-dialog
             :visible="true"
-            v-window
+            v-window="'.el-dialog'"
             window-header=".el-dialog__header"
-            window-resize=".el-dialog"
           >
             <h1>Title</h1>
             <h2>Description</h2>
             <h3>Content</h3>
+            <el-button type="primary" v-window
+              >Try to move and resize me</el-button
+            >
           </el-dialog>
         </div>
         <el-divider></el-divider>

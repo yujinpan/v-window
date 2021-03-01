@@ -1,34 +1,126 @@
-import { getTarget, throttle } from '@/directives/utils';
+import {
+  draggable,
+  getTranslateCoordinate,
+  setTranslate,
+  throttle
+} from '@/directives/utils';
 
-export function resizeable(el: HTMLElement, selector?: string) {
-  const target = getTarget(el, selector);
+export function resizeable(
+  el: HTMLElement,
+  {
+    canResize,
+    onHover,
+    onBlur,
+    onStart,
+    onEnd
+  }: {
+    canResize?: () => boolean;
+    onHover?: Function;
+    onBlur?: Function;
+    onStart?: Function;
+    onEnd?: Function;
+  } = {}
+) {
+  const unbinds = [];
+  let dragging = false;
   let currentDirection: Direction | undefined;
-  document.addEventListener(
-    'mousemove',
-    // @ts-ignore
-    (target.__resizeable__ = throttle((e: MouseEvent) => {
-      const range = getElementRange(target);
-      const direction = getDirectionByRange(e, range);
-      if (direction !== currentDirection) {
-        console.log('change');
-        currentDirection = direction;
-        if (direction) {
-          document.body.style.cursor = getCursorByDirection(direction);
-        } else {
-          document.body.style.cursor = '';
-        }
+
+  // 4条边，4个点的鼠标滑过事件
+  const mousemoveListener = throttle((e: MouseEvent) => {
+    if (dragging) return;
+    const range = getElementRange(el);
+    const direction = getDirectionByRange(e, range);
+    if (direction !== currentDirection) {
+      currentDirection = direction;
+      document.body.style.cursor = getCursor(direction);
+      if (direction) {
+        onHover && onHover();
+      } else {
+        onBlur && onBlur();
       }
-    }, 50)),
-    true
+    }
+  }, 50);
+  document.addEventListener('mousemove', mousemoveListener, true);
+  unbinds.push(() =>
+    document.removeEventListener('mousemove', mousemoveListener, true)
   );
+
+  // 在4条边，4个点上的拖动事件
+  let dragDirection: Direction | undefined;
+  let initX: number;
+  let initY: number;
+  let initWidth: number;
+  let initHeight: number;
+  const unbindDraggable = draggable(
+    document,
+    () => !!currentDirection && (canResize ? canResize() : true),
+    () => {
+      const [x, y] = getTranslateCoordinate(el);
+      const { width, height } = el.getBoundingClientRect();
+      initX = x;
+      initY = y;
+      initWidth = width;
+      initHeight = height;
+      dragDirection = currentDirection;
+      dragging = true;
+      onStart && onStart();
+    },
+    (x, y) => {
+      switch (dragDirection) {
+        case 'top':
+          el.style.height = initHeight - y + 'px';
+          setTranslate(el, initX, initY + y);
+          break;
+        case 'right':
+          el.style.width = initWidth + x + 'px';
+          break;
+        case 'bottom':
+          el.style.height = initHeight + y + 'px';
+          break;
+        case 'left':
+          el.style.width = initWidth - x + 'px';
+          setTranslate(el, initX + x, initY);
+          break;
+        case 'topLeft':
+          el.style.width = initWidth - x + 'px';
+          el.style.height = initHeight - y + 'px';
+          setTranslate(el, initX + x, initY + y);
+          break;
+        case 'topRight':
+          el.style.width = initWidth + x + 'px';
+          el.style.height = initHeight - y + 'px';
+          setTranslate(el, initX, initY + y);
+          break;
+        case 'bottomRight':
+          el.style.width = initWidth + x + 'px';
+          el.style.height = initHeight + y + 'px';
+          break;
+        case 'bottomLeft':
+          el.style.width = initWidth - x + 'px';
+          el.style.height = initHeight + y + 'px';
+          setTranslate(el, initX + x, initY);
+          break;
+      }
+    },
+    () => {
+      dragging = false;
+      onEnd && onEnd();
+    }
+  );
+  unbinds.push(unbindDraggable);
+
+  // 绑定移除事件，在 unbind 阶段移除
+  // @ts-ignore
+  el.__resizeable__ = unbinds;
 }
 
-export function unResizeable(el: HTMLElement, selector?: string) {
-  const target = getTarget(el, selector);
+export function unResizeable(el: HTMLElement) {
   // @ts-ignore
-  if (target.__resizeable__) {
+  if (el.__resizeable__) {
     // @ts-ignore
-    document.removeEventListener('mousemove', target.__resizeable__, true);
+    el.__resizeable__.forEach((item) => item());
+    // @ts-ignore
+    delete el.__resizeable__;
   }
 }
 
@@ -84,7 +176,7 @@ function getDirectionByRange(
   return findDirection;
 }
 
-function getCursorByDirection(direction: Direction): string {
+function getCursor(direction: Direction | undefined): string {
   switch (direction) {
     case 'topLeft':
     case 'bottomRight':
@@ -98,5 +190,7 @@ function getCursorByDirection(direction: Direction): string {
     case 'left':
     case 'right':
       return 'ew-resize';
+    default:
+      return '';
   }
 }
