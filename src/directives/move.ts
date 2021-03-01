@@ -1,28 +1,24 @@
-import { getTarget, throttle } from '@/directives/utils';
+import { draggable, getTarget } from '@/directives/utils';
 
 export function movable(el: HTMLElement, selector?: string) {
   const target = getTarget(el, selector);
-  target.addEventListener(
-    'mousedown',
-    ({ x: startX, y: startY }: MouseEvent) => {
-      const oldTransition = el.style.transition;
+  let oldTransition: string;
+  let initX: number;
+  let initY: number;
+  draggable(
+    target,
+    () => {
+      oldTransition = el.style.transition;
       el.style.transition = 'none';
-
-      const [initX, initY] = getTranslateCoordinate(el.style.transform);
-      startX -= initX;
-      startY -= initY;
-      const mousemoveListener = throttle(({ x: endX, y: endY }: MouseEvent) => {
-        el.style.transform = `translate(${endX - startX}px, ${endY -
-          startY}px)`;
-      });
-      const mouseupListener = () => {
-        el.style.transition = oldTransition;
-
-        document.removeEventListener('mouseup', mouseupListener, true);
-        document.removeEventListener('mousemove', mousemoveListener, true);
-      };
-      document.addEventListener('mouseup', mouseupListener, true);
-      document.addEventListener('mousemove', mousemoveListener, true);
+      const [x, y] = getTranslateCoordinate(el.style.transform);
+      initX = x;
+      initY = y;
+    },
+    (x, y) => {
+      el.style.transform = `translate(${x + initX}px, ${y + initY}px)`;
+    },
+    () => {
+      el.style.transition = oldTransition;
     }
   );
 }
