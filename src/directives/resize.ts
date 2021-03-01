@@ -32,7 +32,9 @@ export function resizeable(
     const direction = getDirectionByRange(e, range);
     if (direction !== currentDirection) {
       currentDirection = direction;
-      document.body.style.cursor = getCursor(direction);
+      const cursor = getCursor(direction);
+      document.body.style.cursor = cursor;
+      el.style.cursor = cursor;
       if (direction) {
         onHover && onHover();
       } else {
