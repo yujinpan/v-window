@@ -3,7 +3,7 @@ import {
   getTranslateCoordinate,
   setTranslate,
   throttle
-} from '@/directives/utils';
+} from './utils';
 
 export function resizeable(
   el: HTMLElement,

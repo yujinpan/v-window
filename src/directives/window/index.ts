@@ -1,7 +1,7 @@
 import { DirectiveOptions } from 'vue';
-import { movable } from '@/directives/move';
-import { resizeable, unResizeable } from '@/directives/resize';
-import { getOptionsByAttrs, getTarget } from '@/directives/utils';
+import { movable } from './move';
+import { resizeable, unResizeable } from './resize';
+import { getOptionsByAttrs, getTarget } from './utils';
 
 /**
  * Window 窗口化指令

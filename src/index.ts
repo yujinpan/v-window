@@ -1,12 +1,10 @@
 // 主组件
-import HelloWorld from '@/components/HelloWorld.vue';
-import './styles/index.scss';
+import Window from '@/directives/window';
 import { VueConstructor } from 'vue';
 
 // @ts-ignore
-HelloWorld.install = (vue: VueConstructor) => {
-  vue.component('HelloWorld', HelloWorld);
+Window.install = (vue: VueConstructor) => {
+  vue.directive('window', Window);
 };
 
-// Vue.component()
-export default HelloWorld;
+export default Window;

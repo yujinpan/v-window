@@ -1,5 +1,5 @@
 <template>
-  <div class="app cm-padding-medium cm-text-center">
+  <div class="app cm-padding-medium">
     <el-dialog
       :visible="true"
       v-window="'.el-dialog'"
@@ -9,11 +9,14 @@
       window-max-width="1500"
       window-max-height="800"
       width="900px"
+      title="Try to move and resize me!"
     >
-      <h2>v-window</h2>
-      <p class="cm-text-secondary">
-        author: yujinpan - version: v{{ version }}
-      </p>
+      <div class="cm-text-center">
+        <h2>v-window</h2>
+        <p class="cm-text-secondary">
+          author: yujinpan - version: v{{ version }}
+        </p>
+      </div>
       <el-divider></el-divider>
       <el-row class="cm-text-left" type="flex">
         <el-col style="height: 500px;overflow: auto;" :span="12">
@@ -21,7 +24,7 @@
         </el-col>
         <el-col class="cm-text-left" :span="12">
           <el-button type="primary" v-window
-            >Try to move and resize me</el-button
+            >Try to move and resize me!</el-button
           >
         </el-col>
       </el-row>
@@ -30,8 +33,7 @@
 </template>
 
 <script>
-import Window from '../src/directives/window';
-import '@/element-ui.ts';
+import Window from '@/index';
 
 const version = require('../package').version;
 
@@ -48,7 +50,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import './styles/common-variables';
 
 .app {
@@ -58,6 +60,9 @@ export default {
     &:last-of-type {
       border-right: 0;
     }
+  }
+  .el-dialog__header {
+    background-color: orange;
   }
 }
 </style>

@@ -3,7 +3,7 @@ import {
   getTarget,
   getTranslateCoordinate,
   setTranslate
-} from '@/directives/utils';
+} from './utils';
 
 export function movable(
   el: HTMLElement,
