@@ -130,12 +130,12 @@ export function resizeable(
         height = minHeight;
       }
       if (maxWidth && width > maxWidth) {
-        if (translateX !== initX) translateX = translateX - (width - maxWidth);
+        if (translateX !== initX) translateX = translateX + (width - maxWidth);
         width = maxWidth;
       }
       if (maxHeight && height > maxHeight) {
         if (translateY !== initY)
-          translateY = translateY - (height - maxHeight);
+          translateY = translateY + (height - maxHeight);
         height = maxHeight;
       }
 
