@@ -1,10 +1,17 @@
 export function throttle(fn: Function & { __throttle__?: any }, time = 0) {
+  let lastArgs: any;
   return function() {
     if (!fn.__throttle__) {
       fn.__throttle__ = setTimeout(() => {
         fn(...arguments);
         fn.__throttle__ = null;
+        if (lastArgs) {
+          fn(...lastArgs);
+          lastArgs = null;
+        }
       }, time);
+    } else {
+      lastArgs = arguments;
     }
   };
 }
