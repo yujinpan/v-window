@@ -6,7 +6,8 @@
   "typings": "types/index.d.ts",
   "files": [
     "lib",
-    "types"
+    "types",
+    "README.md"
   ],
   "keywords": [
     "vue",
