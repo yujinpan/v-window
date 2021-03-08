@@ -8,6 +8,15 @@
     "lib",
     "types"
   ],
+  "keywords": [
+    "vue",
+    "directives",
+    "window",
+    "move",
+    "resize",
+    "modal",
+    "dialog"
+  ],
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "cross-env NODE_ENV=production rollupx",
