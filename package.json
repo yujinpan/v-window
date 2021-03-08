@@ -6,12 +6,11 @@
   "typings": "types/index.d.ts",
   "files": [
     "lib",
-    "types",
-    "src/components"
+    "types"
   ],
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "cross-env NODE_ENV=production rollupx && eslint --fix types/**/*.d.ts",
+    "build": "cross-env NODE_ENV=production rollupx",
     "build:example": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "start": "npm run serve",
@@ -23,11 +22,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.x",
-    "core-js": "^3.9.0",
-    "style-inject": "^0.x",
-    "vue-class-component": "^7.x",
-    "vue-property-decorator": "^8.x",
-    "vue-runtime-helpers": "^1.x"
+    "core-js": "^3.9.0"
   },
   "devDependencies": {
     "@types/jasmine": "^3.6.0",
