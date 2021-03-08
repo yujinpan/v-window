@@ -1,6 +1,6 @@
 # v-window
 
-v-window description
+Move and resize the "window".
 
 ## Usage
 
@@ -10,44 +10,73 @@ v-window description
 npm install --save v-window
 ```
 
-### Require element-ui
-
-If your project does not use element-ui,
-you need to introduce a separate element-ui package, like this:
-
-```js
-import 'v-window/lib/element-ui';
-```
-
 ### Global registration
 
 ```js
-import Vue from 'vue';
-import Component from 'v-window';
+import Vue from "vue";
+import Window from "v-window";
 
-Vue.use(Component);
+Vue.use(Window);
 ```
 
 ### In-component registration
 
 ```js
-import Component from 'v-window';
+import Window from "v-window";
 
 export default {
-  components: {
-    Component
+  directives: {
+    Window
   }
 };
 ```
 
+### Options
+
+- value: the move target element selector
+- modifier `noMove`: disabled move
+- modifier `noResize`: disabled resize
+- attr `window-header`: window's header element selector
+- attr `window-min-width`: resize min width
+- attr `window-min-height`: resize min height
+- attr `window-max-width`: resize max width
+- attr `window-max-height`: resize max height
+
 ### Complete example
 
-```xml
+```vue
 <template>
-  <div></div>
+  <div>
+    - simple:
+    <div v-window></div>
+
+    - with el-dialog
+    <el-dialog v-window="'.el-dialog'" window-header=".el-dialog__header">
+    </el-dialog>
+
+    - all options:
+    <div
+      v-window.noMove.noResize="'.window'"
+      window-header=".header"
+      window-min-width="100"
+      window-min-height="100"
+      window-max-width="1000"
+      window-max-height="1000"
+    >
+      <div class="window">
+        <div class="header">trigger</div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
-export default {};
+import Window from "v-window";
+
+export default {
+  directives: {
+    Window
+  }
+};
 </script>
 ```

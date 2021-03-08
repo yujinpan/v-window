@@ -18,7 +18,7 @@ import { getOptionsByAttrs, getTarget } from './utils';
  *
  * - all options:
  * <div
- *   v-window.noMove.noResize=".window"
+ *   v-window.noMove.noResize="'.window'"
  *   window-header=".header"
  *   window-min-width="100"
  *   window-min-height="100"
