@@ -12,13 +12,21 @@ export function resizeable(
     onHover,
     onBlur,
     onStart,
-    onEnd
+    onEnd,
+    minWidth,
+    minHeight,
+    maxWidth,
+    maxHeight
   }: {
     canResize?: () => boolean;
     onHover?: Function;
     onBlur?: Function;
     onStart?: Function;
     onEnd?: Function;
+    minWidth?: number;
+    minHeight?: number;
+    maxWidth?: number;
+    maxHeight?: number;
   } = {}
 ) {
   const unbinds = [];
@@ -53,6 +61,8 @@ export function resizeable(
   let initY: number;
   let initWidth: number;
   let initHeight: number;
+  minWidth = minWidth || 200;
+  minHeight = minHeight || 136;
   const unbindDraggable = draggable(
     document,
     () => !!currentDirection && (canResize ? canResize() : true),
@@ -68,41 +78,70 @@ export function resizeable(
       onStart && onStart();
     },
     (x, y) => {
+      let height: number = initHeight;
+      let width: number = initWidth;
+      let translateX: number = initX;
+      let translateY: number = initY;
       switch (dragDirection) {
         case 'top':
-          el.style.height = initHeight - y + 'px';
-          setTranslate(el, initX, initY + y);
+          height = initHeight - y;
+          translateY = initY + y;
           break;
         case 'right':
-          el.style.width = initWidth + x + 'px';
+          width = initWidth + x;
           break;
         case 'bottom':
-          el.style.height = initHeight + y + 'px';
+          height = initHeight + y;
           break;
         case 'left':
-          el.style.width = initWidth - x + 'px';
-          setTranslate(el, initX + x, initY);
+          width = initWidth - x;
+          translateX = initX + x;
           break;
         case 'topLeft':
-          el.style.width = initWidth - x + 'px';
-          el.style.height = initHeight - y + 'px';
-          setTranslate(el, initX + x, initY + y);
+          width = initWidth - x;
+          height = initHeight - y;
+          translateX = initX + x;
+          translateY = initY + y;
           break;
         case 'topRight':
-          el.style.width = initWidth + x + 'px';
-          el.style.height = initHeight - y + 'px';
-          setTranslate(el, initX, initY + y);
+          width = initWidth + x;
+          height = initHeight - y;
+          translateY = initY + y;
           break;
         case 'bottomRight':
-          el.style.width = initWidth + x + 'px';
-          el.style.height = initHeight + y + 'px';
+          width = initWidth + x;
+          height = initHeight + y;
           break;
         case 'bottomLeft':
-          el.style.width = initWidth - x + 'px';
-          el.style.height = initHeight + y + 'px';
-          setTranslate(el, initX + x, initY);
+          width = initWidth - x;
+          height = initHeight + y;
+          translateX = initX + x;
           break;
       }
+
+      // size limit
+      if (minWidth && width < minWidth) {
+        if (translateX !== initX) translateX = translateX - (minWidth - width);
+        width = minWidth;
+      }
+      if (minHeight && height < minHeight) {
+        if (translateY !== initY)
+          translateY = translateY - (minHeight - height);
+        height = minHeight;
+      }
+      if (maxWidth && width > maxWidth) {
+        if (translateX !== initX) translateX = translateX - (width - maxWidth);
+        width = maxWidth;
+      }
+      if (maxHeight && height > maxHeight) {
+        if (translateY !== initY)
+          translateY = translateY - (height - maxHeight);
+        height = maxHeight;
+      }
+
+      el.style.width = width + 'px';
+      el.style.height = height + 'px';
+      setTranslate(el, translateX, translateY);
     },
     () => {
       dragging = false;
