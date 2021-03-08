@@ -1,3 +1,5 @@
+import { Obj } from '@/types';
+
 export function throttle(fn: Function & { __throttle__?: any }, time = 0) {
   let lastArgs: any;
   return function() {
@@ -13,16 +15,6 @@ export function throttle(fn: Function & { __throttle__?: any }, time = 0) {
     } else {
       lastArgs = arguments;
     }
-  };
-}
-
-export function debounce(fn: Function & { __debounce__?: any }, time = 60) {
-  return function() {
-    if (fn.__debounce__) clearTimeout(fn.__debounce__);
-    fn.__debounce__ = setTimeout(() => {
-      fn(...arguments);
-      fn.__debounce__ = null;
-    }, time);
   };
 }
 
@@ -67,4 +59,22 @@ export function getTranslateCoordinate(el: HTMLElement): [number, number] {
 
 export function setTranslate(el: HTMLElement, x: number, y: number) {
   el.style.transform = `translate(${x}px, ${y}px)`;
+}
+
+export function getOptionsByAttrs<T extends Obj>(
+  el: HTMLElement,
+  names: { name: string; type?: 'string' | 'number' }[],
+  prefix?: string
+): T {
+  const options: Obj = {};
+  names.forEach(({ name, type = 'string' }) => {
+    const val = el.getAttribute(prefix ? prefix + '-' + name : name);
+
+    options[name] =
+      type === 'number'
+        ? // @ts-ignore
+          +val || 0
+        : val;
+  });
+  return options as T;
 }
