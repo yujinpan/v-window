@@ -61,8 +61,8 @@ export function resizeable(
   let initY: number;
   let initWidth: number;
   let initHeight: number;
-  minWidth = minWidth || 200;
-  minHeight = minHeight || 136;
+  minWidth = minWidth || 34;
+  minHeight = minHeight || 20;
   const unbindDraggable = draggable(
     document,
     () => !!currentDirection && (canResize ? canResize() : true),
