@@ -1,36 +1,31 @@
 <template>
   <div class="app cm-padding-medium cm-text-center">
-    <h2>v-window</h2>
-    <p class="cm-text-secondary">author: yujinpan - version: v{{ version }}</p>
-    <el-divider></el-divider>
-    <el-row class="cm-text-left" type="flex">
-      <el-col :span="12">
-        <Highlight :code="code" lang="xml" />
-      </el-col>
-      <el-col class="cm-text-left" :span="12">
-        <div>
-          <label>Function 1:</label>
-          <el-dialog
-            :visible="true"
-            v-window="'.el-dialog'"
-            window-header=".el-dialog__header"
+    <el-dialog
+      :visible="true"
+      v-window="'.el-dialog'"
+      window-header=".el-dialog__header"
+      window-min-width="50"
+      window-min-height="50"
+      window-max-width="1500"
+      window-max-height="800"
+      width="900px"
+    >
+      <h2>v-window</h2>
+      <p class="cm-text-secondary">
+        author: yujinpan - version: v{{ version }}
+      </p>
+      <el-divider></el-divider>
+      <el-row class="cm-text-left" type="flex">
+        <el-col style="height: 500px;overflow: auto;" :span="12">
+          <Highlight :code="code" lang="xml" />
+        </el-col>
+        <el-col class="cm-text-left" :span="12">
+          <el-button type="primary" v-window
+            >Try to move and resize me</el-button
           >
-            <h1>Title</h1>
-            <h2>Description</h2>
-            <h3>Content</h3>
-            <el-button type="primary" v-window
-              >Try to move and resize me</el-button
-            >
-          </el-dialog>
-        </div>
-        <el-divider></el-divider>
-        <el-link
-          type="primary"
-          href="https://github.com/yujinpan/v-window#attributes"
-          >https://github.com/yujinpan/v-window</el-link
-        >
-      </el-col>
-    </el-row>
+        </el-col>
+      </el-row>
+    </el-dialog>
   </div>
 </template>
 
