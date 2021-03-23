@@ -40,11 +40,11 @@ export function draggable(
       const mouseupListener = () => {
         onEnd && onEnd();
         document.body.style.userSelect = '';
-        document.removeEventListener('mouseup', mouseupListener, true);
-        document.removeEventListener('mousemove', mousemoveListener, true);
+        document.removeEventListener('mouseup', mouseupListener);
+        document.removeEventListener('mousemove', mousemoveListener);
       };
-      document.addEventListener('mouseup', mouseupListener, true);
-      document.addEventListener('mousemove', mousemoveListener, true);
+      document.addEventListener('mouseup', mouseupListener);
+      document.addEventListener('mousemove', mousemoveListener);
     }
   };
   (el as HTMLElement).addEventListener('mousedown', listener);

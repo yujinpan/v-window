@@ -50,9 +50,9 @@ export function resizeable(
       }
     }
   }, 50);
-  document.addEventListener('mousemove', mousemoveListener, true);
+  document.addEventListener('mousemove', mousemoveListener);
   unbinds.push(() =>
-    document.removeEventListener('mousemove', mousemoveListener, true)
+    document.removeEventListener('mousemove', mousemoveListener)
   );
 
   // 在4条边，4个点上的拖动事件
