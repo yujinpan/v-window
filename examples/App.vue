@@ -23,9 +23,9 @@
           <Highlight :code="code" lang="xml" />
         </el-col>
         <el-col class="cm-text-left" :span="12">
-          <el-button type="primary" v-window
-            >Try to move and resize me!</el-button
-          >
+          <div v-window style="background-color: orange;">
+            Try to move and resize me!
+          </div>
         </el-col>
       </el-row>
     </el-dialog>
