@@ -1,11 +1,11 @@
-import { Obj } from '@/types';
+import type { Fn, Obj } from '@/types';
 
-export function throttle(fn: Function & { __throttle__?: any }, time = 0) {
+export function throttle(fn: Fn & { __throttle__?: any }, time = 0) {
   let lastArgs: any;
-  return function() {
+  return function (...args: any[]) {
     if (!fn.__throttle__) {
       fn.__throttle__ = setTimeout(() => {
-        fn(...arguments);
+        fn(...args);
         fn.__throttle__ = null;
         if (lastArgs) {
           fn(...lastArgs);
@@ -13,7 +13,7 @@ export function throttle(fn: Function & { __throttle__?: any }, time = 0) {
         }
       }, time);
     } else {
-      lastArgs = arguments;
+      lastArgs = args;
     }
   };
 }
@@ -25,17 +25,17 @@ export function getTarget(el: HTMLElement, selector?: string): HTMLElement {
 export function draggable(
   el: HTMLElement | Document,
   canDrag: (e: MouseEvent) => boolean,
-  onStart: Function,
+  onStart: Fn,
   onMove: (x: number, y: number) => void,
-  onEnd?: Function
-): Function {
+  onEnd?: Fn,
+): Fn {
   const listener = (e: MouseEvent) => {
     if (e.button === 0 && canDrag(e)) {
       onStart();
       document.body.style.userSelect = 'none';
       const { x: startX, y: startY } = e;
       const mousemoveListener = throttle(({ x: endX, y: endY }: MouseEvent) =>
-        onMove(endX - startX, endY - startY)
+        onMove(endX - startX, endY - startY),
       );
       const mouseupListener = () => {
         onEnd && onEnd();
@@ -64,7 +64,7 @@ export function setTranslate(el: HTMLElement, x: number, y: number) {
 export function getOptionsByAttrs<T extends Obj>(
   el: HTMLElement,
   names: { name: string; type?: 'string' | 'number' }[],
-  prefix?: string
+  prefix?: string,
 ): T {
   const options: Obj = {};
   names.forEach(({ name, type = 'string' }) => {
@@ -72,7 +72,8 @@ export function getOptionsByAttrs<T extends Obj>(
 
     options[name] =
       type === 'number'
-        ? // @ts-ignore
+        ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           +val || 0
         : val;
   });

@@ -1,7 +1,9 @@
 // 主组件
-import Window from '@/directives/window';
-import { VueConstructor } from 'vue';
+import type { VueConstructor } from 'vue';
 
+import Window from '@/directives/window';
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 Window.install = (vue: VueConstructor) => {
   vue.directive('window', Window);

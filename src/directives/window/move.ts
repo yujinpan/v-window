@@ -1,8 +1,10 @@
+import type { Fn } from '../../types';
+
 import {
   draggable,
   getTarget,
   getTranslateCoordinate,
-  setTranslate
+  setTranslate,
 } from './utils';
 
 export function movable(
@@ -11,13 +13,13 @@ export function movable(
     headerSelector,
     canMove,
     onStart,
-    onEnd
+    onEnd,
   }: {
     headerSelector?: string;
     canMove?: () => boolean;
-    onStart?: Function;
-    onEnd?: Function;
-  } = {}
+    onStart?: Fn;
+    onEnd?: Fn;
+  } = {},
 ) {
   const target = getTarget(el, headerSelector);
   let initX: number;
@@ -34,6 +36,6 @@ export function movable(
     (x, y) => {
       setTranslate(el, x + initX, y + initY);
     },
-    onEnd
+    onEnd,
   );
 }

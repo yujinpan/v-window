@@ -1,4 +1,5 @@
-import { DirectiveOptions } from 'vue';
+import type { ObjectDirective } from 'vue';
+
 import { movable } from './move';
 import { resizeable, unResizeable } from './resize';
 import { getOptionsByAttrs, getTarget } from './utils';
@@ -30,7 +31,7 @@ import { getOptionsByAttrs, getTarget } from './utils';
  *   </div>
  * </div>
  */
-const Window: DirectiveOptions = {
+const Window: ObjectDirective = {
   inserted(el: HTMLElement, { value, modifiers }) {
     const target = getTarget(el, value);
     const options = getOptionsByAttrs<{
@@ -46,9 +47,9 @@ const Window: DirectiveOptions = {
         { name: 'min-width', type: 'number' },
         { name: 'min-height', type: 'number' },
         { name: 'max-width', type: 'number' },
-        { name: 'max-height', type: 'number' }
+        { name: 'max-height', type: 'number' },
       ],
-      'window'
+      'window',
     );
 
     // margin can not be 'auto'
@@ -64,17 +65,17 @@ const Window: DirectiveOptions = {
         minWidth: options['min-width'],
         minHeight: options['min-height'],
         maxWidth: options['max-width'],
-        maxHeight: options['max-height']
+        maxHeight: options['max-height'],
       });
     !modifiers.noMove &&
       movable(target, {
         headerSelector: options.header,
-        canMove: () => !resizing
+        canMove: () => !resizing,
       });
   },
   unbind(el, { value, modifiers }) {
     !modifiers.noResize && unResizeable(getTarget(el, value));
-  }
+  },
 };
 
 export default Window;

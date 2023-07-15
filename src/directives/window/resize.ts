@@ -1,8 +1,10 @@
+import type { Fn } from '../../types';
+
 import {
   draggable,
   getTranslateCoordinate,
   setTranslate,
-  throttle
+  throttle,
 } from './utils';
 
 export function resizeable(
@@ -16,18 +18,18 @@ export function resizeable(
     minWidth,
     minHeight,
     maxWidth,
-    maxHeight
+    maxHeight,
   }: {
     canResize?: () => boolean;
-    onHover?: Function;
-    onBlur?: Function;
-    onStart?: Function;
-    onEnd?: Function;
+    onHover?: Fn;
+    onBlur?: Fn;
+    onStart?: Fn;
+    onEnd?: Fn;
     minWidth?: number;
     minHeight?: number;
     maxWidth?: number;
     maxHeight?: number;
-  } = {}
+  } = {},
 ) {
   const unbinds = [];
   let dragging = false;
@@ -52,7 +54,7 @@ export function resizeable(
   }, 50);
   document.addEventListener('mousemove', mousemoveListener);
   unbinds.push(() =>
-    document.removeEventListener('mousemove', mousemoveListener)
+    document.removeEventListener('mousemove', mousemoveListener),
   );
 
   // 在4条边，4个点上的拖动事件
@@ -146,20 +148,24 @@ export function resizeable(
     () => {
       dragging = false;
       onEnd && onEnd();
-    }
+    },
   );
   unbinds.push(unbindDraggable);
 
   // 绑定移除事件，在 unbind 阶段移除
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   el.__resizeable__ = unbinds;
 }
 
 export function unResizeable(el: HTMLElement) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   if (el.__resizeable__) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     el.__resizeable__.forEach((item) => item());
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     delete el.__resizeable__;
   }
@@ -197,13 +203,13 @@ function getElementRange(el: HTMLElement): { [p in Direction]: number[] } {
     top: [leftMax, topMin, rightMin, topMax],
     right: [rightMin, topMax, rightMax, bottomMin],
     bottom: [leftMax, bottomMin, rightMin, bottomMax],
-    left: [leftMin, topMax, leftMax, bottomMin]
+    left: [leftMin, topMax, leftMax, bottomMin],
   };
 }
 
 function getDirectionByRange(
   { x, y }: { x: number; y: number },
-  range: { [p in Direction]: number[] }
+  range: { [p in Direction]: number[] },
 ): Direction | undefined {
   let findDirection: Direction | undefined;
   let key: Direction;
