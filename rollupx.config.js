@@ -1,3 +1,5 @@
+/* eslint-env node */
+
 module.exports = {
   banner:
     '/*!\n' +
@@ -5,8 +7,5 @@ module.exports = {
     ` * (c) 2021-${new Date().getFullYear()} yujinpan\n` +
     ' * Released under the MIT License.\n' +
     ' */\n',
-  // inputFiles: ['src/**/!(*.d).*(ts|js|vue)'],
-  // singleFile: false,
-  // typesOutputDir: 'lib',
-  outputDir: 'lib'
+  outputDir: 'lib',
 };

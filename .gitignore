@@ -1,9 +1,9 @@
 .DS_Store
 node_modules
 stat
-package-lock.json
 lib
 types
+docs/.vuepress/dist
 
 # local env files
 .env.local

@@ -2,6 +2,8 @@
 
 Move and resize the "window".
 
+<demo name="base-usage" />
+
 ## Usage
 
 ### Install
