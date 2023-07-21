@@ -24,13 +24,16 @@ export function getTarget(el: HTMLElement, selector?: string): HTMLElement {
 
 export function draggable(
   el: HTMLElement | Document,
-  canDrag: (e: MouseEvent) => boolean,
-  onStart: Fn,
-  onMove: (x: number, y: number) => void,
-  onEnd?: Fn,
+  options: {
+    canDrag?: (e: MouseEvent) => boolean;
+    onStart: Fn;
+    onMove: (x: number, y: number) => void;
+    onEnd?: Fn;
+  },
 ): Fn {
+  const { canDrag, onStart, onMove, onEnd } = options;
   const listener = (e: MouseEvent) => {
-    if (e.button === 0 && canDrag(e)) {
+    if (e.button === 0 && (!canDrag || canDrag(e))) {
       onStart();
       document.body.style.userSelect = 'none';
       const { x: startX, y: startY } = e;

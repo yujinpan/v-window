@@ -24,18 +24,17 @@ export function movable(
   const target = getTarget(el, headerSelector);
   let initX: number;
   let initY: number;
-  draggable(
-    target,
-    () => (canMove ? canMove() : true),
-    () => {
+  draggable(target, {
+    canDrag: canMove,
+    onStart: () => {
       const [x, y] = getTranslateCoordinate(el);
       initX = x;
       initY = y;
       onStart && onStart();
     },
-    (x, y) => {
+    onMove: (x, y) => {
       setTranslate(el, x + initX, y + initY);
     },
     onEnd,
-  );
+  });
 }

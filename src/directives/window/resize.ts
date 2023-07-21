@@ -69,10 +69,9 @@ export function resizeable(
   let initTop: string;
   minWidth = minWidth || 34;
   minHeight = minHeight || 20;
-  const unbindDraggable = draggable(
-    document,
-    () => !!currentDirection && (canResize ? canResize() : true),
-    () => {
+  const unbindDraggable = draggable(document, {
+    canDrag: () => !!currentDirection && (canResize ? canResize() : true),
+    onStart: () => {
       const [x, y] = getTranslateCoordinate(el);
       const { width, height } = el.getBoundingClientRect();
       const { left, top } = getComputedStyle(el);
@@ -86,7 +85,7 @@ export function resizeable(
       dragging = true;
       onStart && onStart();
     },
-    (x, y) => {
+    onMove: (x, y) => {
       let height: number = initHeight;
       let width: number = initWidth;
       let translateX: number = initX;
@@ -181,11 +180,11 @@ export function resizeable(
       el.style.height = height + 'px';
       setTranslate(el, translateX, translateY);
     },
-    () => {
+    onEnd: () => {
       dragging = false;
       onEnd && onEnd();
     },
-  );
+  });
   unbinds.push(unbindDraggable);
 
   // 绑定移除事件，在 unbind 阶段移除
