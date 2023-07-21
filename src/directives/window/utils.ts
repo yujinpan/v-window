@@ -38,7 +38,7 @@ export function draggable(
       document.body.style.userSelect = 'none';
       const { x: startX, y: startY } = e;
       const mousemoveListener = throttle(({ x: endX, y: endY }: MouseEvent) =>
-        onMove(endX - startX, endY - startY),
+        onMove(inRangeBodyX(endX) - startX, inRangeBodyY(endY) - startY),
       );
       const mouseupListener = () => {
         onEnd && onEnd();
@@ -97,4 +97,16 @@ export function isPositionRight(el: HTMLElement, initLeft: string) {
 export function isPositionBottom(el: HTMLElement, initTop: string) {
   const { top, bottom } = getComputedStyle(el);
   return (top === 'auto' && bottom !== 'auto') || initTop !== top;
+}
+
+function inRange(x: number, min: number, max: number) {
+  return x < min ? min : Math.min(x, max);
+}
+
+function inRangeBodyX(x: number) {
+  return inRange(x, 0, document.body.clientWidth);
+}
+
+function inRangeBodyY(y: number) {
+  return inRange(y, 0, document.body.clientHeight);
 }
