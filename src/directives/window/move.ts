@@ -25,7 +25,7 @@ export function movable(
   let initX: number;
   let initY: number;
   draggable(target, {
-    canDrag: canMove,
+    canStart: canMove,
     onStart: () => {
       const [x, y] = getTranslateCoordinate(el);
       initX = x;

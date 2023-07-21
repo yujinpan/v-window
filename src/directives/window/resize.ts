@@ -70,7 +70,7 @@ export function resizeable(
   minWidth = minWidth || 34;
   minHeight = minHeight || 20;
   const unbindDraggable = draggable(document, {
-    canDrag: () => !!currentDirection && (canResize ? canResize() : true),
+    canStart: () => !!currentDirection && (canResize ? canResize() : true),
     onStart: () => {
       const [x, y] = getTranslateCoordinate(el);
       const { width, height } = el.getBoundingClientRect();

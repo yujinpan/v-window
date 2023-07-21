@@ -25,15 +25,15 @@ export function getTarget(el: HTMLElement, selector?: string): HTMLElement {
 export function draggable(
   el: HTMLElement | Document,
   options: {
-    canDrag?: (e: MouseEvent) => boolean;
+    canStart?: (e: MouseEvent) => boolean;
     onStart: Fn;
     onMove: (x: number, y: number) => void;
     onEnd?: Fn;
   },
 ): Fn {
-  const { canDrag, onStart, onMove, onEnd } = options;
+  const { canStart, onStart, onMove, onEnd } = options;
   const listener = (e: MouseEvent) => {
-    if (e.button === 0 && (!canDrag || canDrag(e))) {
+    if (e.button === 0 && (!canStart || canStart(e))) {
       onStart();
       document.body.style.userSelect = 'none';
       const { x: startX, y: startY } = e;
