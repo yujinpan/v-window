@@ -3,6 +3,8 @@ import type { Fn } from '../../types';
 import {
   draggable,
   getTranslateCoordinate,
+  isPositionBottom,
+  isPositionRight,
   setTranslate,
   throttle,
 } from './utils';
@@ -63,6 +65,8 @@ export function resizeable(
   let initY: number;
   let initWidth: number;
   let initHeight: number;
+  let initLeft: string;
+  let initTop: string;
   minWidth = minWidth || 34;
   minHeight = minHeight || 20;
   const unbindDraggable = draggable(
@@ -71,10 +75,13 @@ export function resizeable(
     () => {
       const [x, y] = getTranslateCoordinate(el);
       const { width, height } = el.getBoundingClientRect();
+      const { left, top } = getComputedStyle(el);
       initX = x;
       initY = y;
       initWidth = width;
       initHeight = height;
+      initLeft = left;
+      initTop = top;
       dragDirection = currentDirection;
       dragging = true;
       onStart && onStart();
@@ -87,37 +94,66 @@ export function resizeable(
       switch (dragDirection) {
         case 'top':
           height = initHeight - y;
-          translateY = initY + y;
+          if (!isPositionBottom(el, initTop)) {
+            translateY = initY + y;
+          }
           break;
         case 'right':
           width = initWidth + x;
+          if (isPositionRight(el, initLeft)) {
+            translateX = initX + x;
+          }
           break;
         case 'bottom':
           height = initHeight + y;
+          if (isPositionBottom(el, initTop)) {
+            translateY = initY + y;
+          }
           break;
         case 'left':
           width = initWidth - x;
-          translateX = initX + x;
+          if (!isPositionRight(el, initLeft)) {
+            translateX = initX + x;
+          }
           break;
         case 'topLeft':
           width = initWidth - x;
           height = initHeight - y;
-          translateX = initX + x;
-          translateY = initY + y;
+          if (!isPositionRight(el, initLeft)) {
+            translateX = initX + x;
+          }
+          if (!isPositionBottom(el, initTop)) {
+            translateY = initY + y;
+          }
           break;
         case 'topRight':
           width = initWidth + x;
           height = initHeight - y;
-          translateY = initY + y;
+          if (!isPositionBottom(el, initTop)) {
+            translateY = initY + y;
+          }
+          if (isPositionRight(el, initLeft)) {
+            translateX = initX + x;
+          }
           break;
         case 'bottomRight':
           width = initWidth + x;
           height = initHeight + y;
+          if (isPositionRight(el, initLeft)) {
+            translateX = initX + x;
+          }
+          if (isPositionBottom(el, initTop)) {
+            translateY = initY + y;
+          }
           break;
         case 'bottomLeft':
           width = initWidth - x;
           height = initHeight + y;
-          translateX = initX + x;
+          if (!isPositionBottom(el, initTop)) {
+            translateX = initX + x;
+          } else {
+            translateY = initY + y;
+          }
           break;
       }
 

@@ -79,3 +79,19 @@ export function getOptionsByAttrs<T extends Obj>(
   });
   return options as T;
 }
+
+/**
+ * position right, like: {left: auto; right: 0px;}
+ */
+export function isPositionRight(el: HTMLElement, initLeft: string) {
+  const { left, right } = getComputedStyle(el);
+  return (left === 'auto' && right !== 'auto') || initLeft !== left;
+}
+
+/**
+ * position right, like: {left: auto; right: 0px;}
+ */
+export function isPositionBottom(el: HTMLElement, initTop: string) {
+  const { top, bottom } = getComputedStyle(el);
+  return (top === 'auto' && bottom !== 'auto') || initTop !== top;
+}
