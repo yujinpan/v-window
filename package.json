@@ -22,6 +22,7 @@
   "scripts": {
     "publish:beta": "npm version prerelease --preid=beta && npm publish --registry=https://registry.npmjs.org",
     "publish:patch": "npm version patch && npm publish",
+    "publish:major": "npm version major && npm publish",
     "version": "npm run build",
     "postversion": "git push --all && git push --tags",
     "dev": "vite",
