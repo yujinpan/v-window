@@ -186,6 +186,7 @@ export function resizeable(
         right: direction.includes('left') ? undefined : right,
       };
     },
+    boundsTarget: el,
   });
   unbinds.push(unbindDraggable);
 

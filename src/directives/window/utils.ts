@@ -35,31 +35,29 @@ export type DraggableOptions = {
   onMove: (x: number, y: number) => void;
   onEnd?: (e: MouseEvent) => any;
   getPointerBounds?: (e: MouseEvent) => Bounds;
+  boundsTarget?: HTMLElement;
 };
 
 export function draggable(
   el: HTMLElement | Document,
   options: DraggableOptions,
 ): Fn {
-  const { canStart, onStart, onMove, onEnd, getPointerBounds } = options;
+  const { canStart, onStart, onMove, onEnd, getPointerBounds, boundsTarget } =
+    options;
   const listener = (e: MouseEvent) => {
     if (e.button === 0 && (!canStart || canStart(e))) {
       onStart(e);
       document.body.style.userSelect = 'none';
       const { x: startX, y: startY } = e;
-      const { top, right, bottom, left } = getPointerBounds?.(e) || {};
+      const bounds = getPointerBounds?.(e) || {};
       const mousemoveListener = throttle((e: MouseEvent) => {
+        const { left, right, top, bottom } = getOffsetParentRange(
+          boundsTarget,
+          bounds,
+        );
         let { x: endX, y: endY } = e;
-        endX = inRange(
-          endX,
-          left || 0,
-          document.body.clientWidth - (right || 0),
-        );
-        endY = inRange(
-          endY,
-          top || 0,
-          document.body.clientHeight - (bottom || 0),
-        );
+        endX = inRange(endX, left, right);
+        endY = inRange(endY, top, bottom);
         onMove(endX - startX, endY - startY);
       });
       const mouseupListener = (e: MouseEvent) => {
@@ -160,4 +158,15 @@ export function limitAddVal(
     }
   }
   return add;
+}
+
+function getOffsetParentRange(el: HTMLElement | undefined, bounds: Bounds) {
+  const parent = el?.offsetParent || document.body;
+  const { x, y, width, height } = parent.getBoundingClientRect();
+  return {
+    left: x + (bounds.left || 0),
+    right: x + width - (bounds.right || 0),
+    top: y + (bounds.top || 0),
+    bottom: y + height - (bounds.bottom || 0),
+  };
 }

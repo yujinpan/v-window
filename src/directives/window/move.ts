@@ -41,5 +41,6 @@ export function movable(
     },
     onEnd,
     getPointerBounds,
+    boundsTarget: el,
   });
 }
