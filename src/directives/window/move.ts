@@ -1,4 +1,4 @@
-import type { Fn } from '../../types';
+import type { DraggableOptions } from './utils';
 
 import {
   draggable,
@@ -14,27 +14,32 @@ export function movable(
     canMove,
     onStart,
     onEnd,
+    getPointerBounds,
   }: {
     headerSelector?: string;
     canMove?: () => boolean;
-    onStart?: Fn;
-    onEnd?: Fn;
-  } = {},
+  } & Partial<
+    Pick<
+      DraggableOptions,
+      'canStart' | 'onStart' | 'onEnd' | 'getPointerBounds'
+    >
+  > = {},
 ) {
   const target = getTarget(el, headerSelector);
   let initX: number;
   let initY: number;
   draggable(target, {
     canStart: canMove,
-    onStart: () => {
+    onStart: (e) => {
       const [x, y] = getTranslateCoordinate(el);
       initX = x;
       initY = y;
-      onStart && onStart();
+      onStart && onStart(e);
     },
     onMove: (x, y) => {
       setTranslate(el, x + initX, y + initY);
     },
     onEnd,
+    getPointerBounds,
   });
 }

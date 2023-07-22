@@ -1,3 +1,4 @@
+import type { DraggableOptions } from './utils';
 import type { Fn } from '../../types';
 
 import {
@@ -5,6 +6,7 @@ import {
   getTranslateCoordinate,
   isPositionBottom,
   isPositionRight,
+  limitAddVal,
   setTranslate,
   throttle,
 } from './utils';
@@ -17,6 +19,7 @@ export function resizeable(
     onBlur,
     onStart,
     onEnd,
+    getPointerBounds,
     minWidth,
     minHeight,
     maxWidth,
@@ -25,13 +28,16 @@ export function resizeable(
     canResize?: () => boolean;
     onHover?: Fn;
     onBlur?: Fn;
-    onStart?: Fn;
-    onEnd?: Fn;
     minWidth?: number;
     minHeight?: number;
     maxWidth?: number;
     maxHeight?: number;
-  } = {},
+  } & Partial<
+    Pick<
+      DraggableOptions,
+      'canStart' | 'onStart' | 'onEnd' | 'getPointerBounds'
+    >
+  > = {},
 ) {
   const unbinds = [];
   let dragging = false;
@@ -71,7 +77,7 @@ export function resizeable(
   minHeight = minHeight || 20;
   const unbindDraggable = draggable(document, {
     canStart: () => !!currentDirection && (canResize ? canResize() : true),
-    onStart: () => {
+    onStart: (e) => {
       const [x, y] = getTranslateCoordinate(el);
       const { width, height } = el.getBoundingClientRect();
       const { left, top } = getComputedStyle(el);
@@ -83,106 +89,102 @@ export function resizeable(
       initTop = top;
       dragDirection = currentDirection;
       dragging = true;
-      onStart && onStart();
+      onStart && onStart(e);
     },
     onMove: (x, y) => {
       let height: number = initHeight;
       let width: number = initWidth;
       let translateX: number = initX;
       let translateY: number = initY;
+
+      const limitAddX = (x: number) => {
+        return limitAddVal(width, x, minWidth, maxWidth);
+      };
+      const limitAddY = (y: number) => {
+        return limitAddVal(height, y, minHeight, maxHeight);
+      };
+
+      const setTop = () => {
+        // to top is add, to bottom is reduce
+        y = limitAddY(-y);
+        height = initHeight + y;
+        if (!isPositionBottom(el, initTop)) {
+          translateY = initY - y;
+        }
+      };
+      const setBottom = () => {
+        // to top is reduce, to bottom is add
+        y = limitAddY(y);
+        height = initHeight + y;
+        if (isPositionBottom(el, initTop)) {
+          translateY = initY + y;
+        }
+      };
+      const setLeft = () => {
+        // to left is add, to right is reduce
+        x = limitAddX(-x);
+        width = initWidth + x;
+        if (!isPositionRight(el, initLeft)) {
+          translateX = initX - x;
+        }
+      };
+      const setRight = () => {
+        // to left is reduce, to right is add
+        x = limitAddX(x);
+        width = initWidth + x;
+        if (isPositionRight(el, initLeft)) {
+          translateX = initX + x;
+        }
+      };
+
       switch (dragDirection) {
         case 'top':
-          height = initHeight - y;
-          if (!isPositionBottom(el, initTop)) {
-            translateY = initY + y;
-          }
+          setTop();
           break;
         case 'right':
-          width = initWidth + x;
-          if (isPositionRight(el, initLeft)) {
-            translateX = initX + x;
-          }
+          setRight();
           break;
         case 'bottom':
-          height = initHeight + y;
-          if (isPositionBottom(el, initTop)) {
-            translateY = initY + y;
-          }
+          setBottom();
           break;
         case 'left':
-          width = initWidth - x;
-          if (!isPositionRight(el, initLeft)) {
-            translateX = initX + x;
-          }
+          setLeft();
           break;
         case 'topLeft':
-          width = initWidth - x;
-          height = initHeight - y;
-          if (!isPositionRight(el, initLeft)) {
-            translateX = initX + x;
-          }
-          if (!isPositionBottom(el, initTop)) {
-            translateY = initY + y;
-          }
+          setTop();
+          setLeft();
           break;
         case 'topRight':
-          width = initWidth + x;
-          height = initHeight - y;
-          if (!isPositionBottom(el, initTop)) {
-            translateY = initY + y;
-          }
-          if (isPositionRight(el, initLeft)) {
-            translateX = initX + x;
-          }
+          setTop();
+          setRight();
           break;
         case 'bottomRight':
-          width = initWidth + x;
-          height = initHeight + y;
-          if (isPositionRight(el, initLeft)) {
-            translateX = initX + x;
-          }
-          if (isPositionBottom(el, initTop)) {
-            translateY = initY + y;
-          }
+          setBottom();
+          setRight();
           break;
         case 'bottomLeft':
-          width = initWidth - x;
-          height = initHeight + y;
-          if (!isPositionBottom(el, initTop)) {
-            translateX = initX + x;
-          } else {
-            translateY = initY + y;
-          }
+          setBottom();
+          setLeft();
           break;
-      }
-
-      // size limit
-      if (minWidth && width < minWidth) {
-        if (translateX !== initX) translateX = translateX - (minWidth - width);
-        width = minWidth;
-      }
-      if (minHeight && height < minHeight) {
-        if (translateY !== initY)
-          translateY = translateY - (minHeight - height);
-        height = minHeight;
-      }
-      if (maxWidth && width > maxWidth) {
-        if (translateX !== initX) translateX = translateX + (width - maxWidth);
-        width = maxWidth;
-      }
-      if (maxHeight && height > maxHeight) {
-        if (translateY !== initY)
-          translateY = translateY + (height - maxHeight);
-        height = maxHeight;
       }
 
       el.style.width = width + 'px';
       el.style.height = height + 'px';
       setTranslate(el, translateX, translateY);
     },
-    onEnd: () => {
+    onEnd: (e) => {
       dragging = false;
-      onEnd && onEnd();
+      onEnd && onEnd(e);
+    },
+    getPointerBounds: (e) => {
+      const { top, right, bottom, left } = getPointerBounds?.(e) || {};
+      const direction = dragDirection?.toLowerCase() || '';
+      return {
+        top: direction.includes('bottom') ? undefined : top,
+        bottom: direction.includes('top') ? undefined : bottom,
+        left: direction.includes('right') ? undefined : left,
+        right: direction.includes('left') ? undefined : right,
+      };
     },
   });
   unbinds.push(unbindDraggable);

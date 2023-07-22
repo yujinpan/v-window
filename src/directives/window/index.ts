@@ -25,6 +25,10 @@ import { getOptionsByAttrs, getTarget } from './utils';
  *   window-min-height="100"
  *   window-max-width="1000"
  *   window-max-height="1000"
+ *   window-top="100"
+ *   window-right="100"
+ *   window-bottom="100"
+ *   window-left="100"
  * >
  *   <div class="window">
  *     <div class="header">trigger</div>
@@ -40,6 +44,10 @@ const Window: ObjectDirective = {
       'min-height': number;
       'max-width': number;
       'max-height': number;
+      top: number;
+      right: number;
+      bottom: number;
+      left: number;
     }>(
       el,
       [
@@ -48,9 +56,16 @@ const Window: ObjectDirective = {
         { name: 'min-height', type: 'number' },
         { name: 'max-width', type: 'number' },
         { name: 'max-height', type: 'number' },
+        { name: 'top', type: 'number' },
+        { name: 'right', type: 'number' },
+        { name: 'bottom', type: 'number' },
+        { name: 'left', type: 'number' },
       ],
       'window',
     );
+    const getPointerBounds = () => {
+      return options;
+    };
 
     // margin can not be 'auto'
     target.style.margin = getComputedStyle(target).margin;
@@ -62,6 +77,7 @@ const Window: ObjectDirective = {
       resizeable(target, {
         onHover: () => (resizing = true),
         onBlur: () => (resizing = false),
+        getPointerBounds,
         minWidth: options['min-width'],
         minHeight: options['min-height'],
         maxWidth: options['max-width'],
@@ -71,6 +87,7 @@ const Window: ObjectDirective = {
       movable(target, {
         headerSelector: options.header,
         canMove: () => !resizing,
+        getPointerBounds,
       });
   },
   unbind(el, { value, modifiers }) {

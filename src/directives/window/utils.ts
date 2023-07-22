@@ -22,26 +22,48 @@ export function getTarget(el: HTMLElement, selector?: string): HTMLElement {
   return selector ? el.querySelector(selector) || el : el;
 }
 
+export type Bounds = {
+  top?: number;
+  right?: number;
+  bottom?: number;
+  left?: number;
+};
+
+export type DraggableOptions = {
+  canStart?: (e: MouseEvent) => boolean;
+  onStart: (e: MouseEvent) => any;
+  onMove: (x: number, y: number) => void;
+  onEnd?: (e: MouseEvent) => any;
+  getPointerBounds?: (e: MouseEvent) => Bounds;
+};
+
 export function draggable(
   el: HTMLElement | Document,
-  options: {
-    canStart?: (e: MouseEvent) => boolean;
-    onStart: Fn;
-    onMove: (x: number, y: number) => void;
-    onEnd?: Fn;
-  },
+  options: DraggableOptions,
 ): Fn {
-  const { canStart, onStart, onMove, onEnd } = options;
+  const { canStart, onStart, onMove, onEnd, getPointerBounds } = options;
   const listener = (e: MouseEvent) => {
     if (e.button === 0 && (!canStart || canStart(e))) {
-      onStart();
+      onStart(e);
       document.body.style.userSelect = 'none';
       const { x: startX, y: startY } = e;
-      const mousemoveListener = throttle(({ x: endX, y: endY }: MouseEvent) =>
-        onMove(inRangeBodyX(endX) - startX, inRangeBodyY(endY) - startY),
-      );
-      const mouseupListener = () => {
-        onEnd && onEnd();
+      const { top, right, bottom, left } = getPointerBounds?.(e) || {};
+      const mousemoveListener = throttle((e: MouseEvent) => {
+        let { x: endX, y: endY } = e;
+        endX = inRange(
+          endX,
+          left || 0,
+          document.body.clientWidth - (right || 0),
+        );
+        endY = inRange(
+          endY,
+          top || 0,
+          document.body.clientHeight - (bottom || 0),
+        );
+        onMove(endX - startX, endY - startY);
+      });
+      const mouseupListener = (e: MouseEvent) => {
+        onEnd && onEnd(e);
         document.body.style.userSelect = '';
         document.removeEventListener('mouseup', mouseupListener);
         document.removeEventListener('mousemove', mousemoveListener);
@@ -73,12 +95,9 @@ export function getOptionsByAttrs<T extends Obj>(
   names.forEach(({ name, type = 'string' }) => {
     const val = el.getAttribute(prefix ? prefix + '-' + name : name);
 
-    options[name] =
-      type === 'number'
-        ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          +val || 0
-        : val;
+    if (val) {
+      options[name] = type === 'number' ? toNum(val) : val;
+    }
   });
   return options as T;
 }
@@ -87,26 +106,58 @@ export function getOptionsByAttrs<T extends Obj>(
  * position right, like: {left: auto; right: 0px;}
  */
 export function isPositionRight(el: HTMLElement, initLeft: string) {
+  const width = el.style.width;
+  // test
+  el.style.width = '1px';
   const { left, right } = getComputedStyle(el);
-  return (left === 'auto' && right !== 'auto') || initLeft !== left;
+  const result = (left === 'auto' && right !== 'auto') || initLeft !== left;
+  // restore
+  el.style.width = width;
+  return result;
 }
 
 /**
  * position right, like: {left: auto; right: 0px;}
  */
 export function isPositionBottom(el: HTMLElement, initTop: string) {
+  const height = el.style.height;
+  // test
+  el.style.height = '1px';
   const { top, bottom } = getComputedStyle(el);
-  return (top === 'auto' && bottom !== 'auto') || initTop !== top;
+  const result = (top === 'auto' && bottom !== 'auto') || initTop !== top;
+  // restore
+  el.style.height = height;
+  return result;
 }
 
-function inRange(x: number, min: number, max: number) {
-  return x < min ? min : Math.min(x, max);
+function inRange(val: number, min: number, max: number) {
+  return val < min ? min : Math.min(val, max);
 }
 
-function inRangeBodyX(x: number) {
-  return inRange(x, 0, document.body.clientWidth);
+function toNum(val: any) {
+  return (typeof val === 'string' ? +val.replace(/\D/g, '') : +val) || 0;
 }
 
-function inRangeBodyY(y: number) {
-  return inRange(y, 0, document.body.clientHeight);
+export function limitAddVal(
+  current: number,
+  add: number,
+  min: number | undefined,
+  max: number | undefined,
+) {
+  if (add < 0) {
+    if (min) {
+      const minAdd = min - current;
+      if (add < minAdd) {
+        return minAdd;
+      }
+    }
+  } else {
+    if (max) {
+      const maxAdd = max - current;
+      if (add > maxAdd) {
+        return maxAdd;
+      }
+    }
+  }
+  return add;
 }
