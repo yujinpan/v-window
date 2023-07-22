@@ -43,6 +43,10 @@ export default {
 - attr `window-min-height`: resize min height
 - attr `window-max-width`: resize max width
 - attr `window-max-height`: resize max height
+- attr `window-top`: limit pointer top
+- attr `window-right`: limit pointer right
+- attr `window-bottom`: limit pointer bottom
+- attr `window-left`: limit pointer left
 
 ### Complete example
 
@@ -58,12 +62,16 @@ export default {
 
     - all options:
     <div
-      v-window.noMove.noResize="'.window'"
-      window-header=".header"
-      window-min-width="100"
-      window-min-height="100"
-      window-max-width="1000"
-      window-max-height="1000"
+        v-window.noMove.noResize="'.window'"
+        window-header=".header"
+        window-min-width="100"
+        window-min-height="100"
+        window-max-width="1000"
+        window-max-height="1000"
+        window-top="100"
+        window-right="100"
+        window-bottom="100"
+        window-left="100"
     >
       <div class="window">
         <div class="header">trigger</div>
