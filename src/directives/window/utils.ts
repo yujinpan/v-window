@@ -103,7 +103,8 @@ export function getOptionsByAttrs<T extends Obj>(
 /**
  * position right, like: {left: auto; right: 0px;}
  */
-export function isPositionRight(el: HTMLElement, initLeft: string) {
+export function isPositionRight(el: HTMLElement) {
+  const initLeft = getComputedStyle(el).left;
   const width = el.style.width;
   // test
   el.style.width = '1px';
@@ -117,7 +118,8 @@ export function isPositionRight(el: HTMLElement, initLeft: string) {
 /**
  * position right, like: {left: auto; right: 0px;}
  */
-export function isPositionBottom(el: HTMLElement, initTop: string) {
+export function isPositionBottom(el: HTMLElement) {
+  const initTop = getComputedStyle(el).top;
   const height = el.style.height;
   // test
   el.style.height = '1px';

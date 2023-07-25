@@ -108,7 +108,7 @@ export function resizeable(
         // to top is add, to bottom is reduce
         y = limitAddY(-y);
         height = initHeight + y;
-        if (!isPositionBottom(el, initTop)) {
+        if (!isPositionBottom(el)) {
           translateY = initY - y;
         }
       };
@@ -116,7 +116,7 @@ export function resizeable(
         // to top is reduce, to bottom is add
         y = limitAddY(y);
         height = initHeight + y;
-        if (isPositionBottom(el, initTop)) {
+        if (isPositionBottom(el)) {
           translateY = initY + y;
         }
       };
@@ -124,7 +124,7 @@ export function resizeable(
         // to left is add, to right is reduce
         x = limitAddX(-x);
         width = initWidth + x;
-        if (!isPositionRight(el, initLeft)) {
+        if (!isPositionRight(el)) {
           translateX = initX - x;
         }
       };
@@ -132,7 +132,7 @@ export function resizeable(
         // to left is reduce, to right is add
         x = limitAddX(x);
         width = initWidth + x;
-        if (isPositionRight(el, initLeft)) {
+        if (isPositionRight(el)) {
           translateX = initX + x;
         }
       };
