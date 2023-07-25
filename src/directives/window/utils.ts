@@ -35,7 +35,7 @@ export type DraggableOptions = {
   onMove: (x: number, y: number) => void;
   onEnd?: (e: MouseEvent) => any;
   getPointerBounds?: (e: MouseEvent) => Bounds;
-  boundsTarget?: HTMLElement;
+  boundsTarget: HTMLElement;
 };
 
 export function draggable(
@@ -48,9 +48,12 @@ export function draggable(
     if (e.button === 0 && (!canStart || canStart(e))) {
       onStart(e);
       document.body.style.userSelect = 'none';
+      const overlayBoundsArr = getOverlayBoundsArr(boundsTarget);
       const { x: startX, y: startY } = e;
       const bounds = getPointerBounds?.(e) || {};
       const mousemoveListener = throttle((e: MouseEvent) => {
+        if (isInBoundsArr(overlayBoundsArr, e)) return;
+
         const { left, right, top, bottom } = getOffsetParentRange(
           boundsTarget,
           bounds,
@@ -171,4 +174,66 @@ function getOffsetParentRange(el: HTMLElement | undefined, bounds: Bounds) {
     top: y + (bounds.top || 0),
     bottom: y + height - (bounds.bottom || 0),
   };
+}
+
+function isInBoundsArr(boundsArr: Required<Bounds>[], e: MouseEvent) {
+  return boundsArr.some(
+    (item) =>
+      e.y >= item.top &&
+      e.y <= item.bottom &&
+      e.x >= item.left &&
+      e.x <= item.right,
+  );
+}
+
+function getOverlayBoundsArr(el: HTMLElement) {
+  const oldStyle = el.getAttribute('style');
+  el.setAttribute(
+    'style',
+    'position:absolute;top:0;left:0;width:100%;height:100%;',
+  );
+  const result = mergeBoundsArr(
+    getIntersectElements(el).map((item) => item.getBoundingClientRect()),
+  );
+  el.setAttribute('style', oldStyle as any);
+  return result;
+}
+
+function getIntersectElements(el: HTMLElement): HTMLElement[] {
+  return deDup(
+    getInterpolationPoints(el.getBoundingClientRect()).flatMap((item) => {
+      const elements = document.elementsFromPoint(item[0], item[1]);
+      const find = elements.findIndex((item) => item === el);
+      return elements.slice(0, find >= 0 ? find : 0);
+    }),
+  );
+}
+
+function deDup(arr: any[]) {
+  return Array.from(new Set(arr));
+}
+
+function mergeBoundsArr(boundsArr: Required<Bounds>[]) {
+  return boundsArr.filter((item) =>
+    boundsArr.every(
+      (bounds) =>
+        !(
+          item !== bounds &&
+          bounds.top <= item.top &&
+          bounds.right >= item.right &&
+          bounds.bottom >= item.bottom &&
+          bounds.left <= item.left
+        ),
+    ),
+  );
+}
+
+function getInterpolationPoints(bounds: Required<Bounds>, distance = 50) {
+  const result: number[][] = [];
+  for (let i = bounds.left; i <= bounds.right; i += distance) {
+    for (let j = bounds.top; j <= bounds.bottom; j += distance) {
+      result.push([i, j]);
+    }
+  }
+  return result;
 }
