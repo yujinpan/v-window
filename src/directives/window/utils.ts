@@ -48,16 +48,29 @@ export function draggable(
     if (e.button === 0 && (!canStart || canStart(e))) {
       onStart(e);
       document.body.style.userSelect = 'none';
+
       const overlayBoundsArr = getOverlayBoundsArr(boundsTarget);
+      let inOverlay = false;
+
       const { x: startX, y: startY } = e;
       const bounds = getPointerBounds?.(e) || {};
       const mousemoveListener = throttle((e: MouseEvent) => {
-        if (isInBoundsArr(overlayBoundsArr, e)) return;
+        // handle move with no overlay
+        if (isInBoundsArr(overlayBoundsArr, e)) {
+          inOverlay = true;
+          return;
+        }
 
-        const { left, right, top, bottom } = getOffsetParentRange(
-          boundsTarget,
-          bounds,
-        );
+        const offsetBounds = getOffsetParentRange(boundsTarget, bounds);
+
+        // leave overlay must be not out first
+        if (inOverlay && !isContainsPoint(offsetBounds, e)) {
+          return;
+        } else {
+          inOverlay = false;
+        }
+
+        const { left, right, top, bottom } = offsetBounds;
         let { x: endX, y: endY } = e;
         endX = inRange(endX, left, right);
         endY = inRange(endY, top, bottom);
@@ -216,16 +229,30 @@ function deDup(arr: any[]) {
 function mergeBoundsArr(boundsArr: Required<Bounds>[]) {
   return boundsArr.filter((item) =>
     boundsArr.every(
-      (bounds) =>
-        !(
-          item !== bounds &&
-          bounds.top <= item.top &&
-          bounds.right >= item.right &&
-          bounds.bottom >= item.bottom &&
-          bounds.left <= item.left
-        ),
+      (bounds) => !(item !== bounds && isContainsBounds(bounds, item)),
     ),
   );
+}
+
+function isContainsBounds(source: Required<Bounds>, target: Required<Bounds>) {
+  return (
+    source.top <= target.top &&
+    source.right >= target.right &&
+    source.bottom >= target.bottom &&
+    source.left <= target.left
+  );
+}
+
+function isContainsPoint(
+  source: Required<Bounds>,
+  point: { x: number; y: number },
+) {
+  return isContainsBounds(source, {
+    top: point.y,
+    right: point.x,
+    bottom: point.y,
+    left: point.x,
+  });
 }
 
 function getInterpolationPoints(bounds: Required<Bounds>, distance = 50) {
