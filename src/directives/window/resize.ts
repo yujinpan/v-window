@@ -71,8 +71,6 @@ export function resizeable(
   let initY: number;
   let initWidth: number;
   let initHeight: number;
-  let initLeft: string;
-  let initTop: string;
   minWidth = minWidth || 34;
   minHeight = minHeight || 20;
   const unbindDraggable = draggable(document, {
@@ -80,13 +78,10 @@ export function resizeable(
     onStart: (e) => {
       const [x, y] = getTranslateCoordinate(el);
       const { width, height } = el.getBoundingClientRect();
-      const { left, top } = getComputedStyle(el);
       initX = x;
       initY = y;
       initWidth = width;
       initHeight = height;
-      initLeft = left;
-      initTop = top;
       dragDirection = currentDirection;
       dragging = true;
       onStart && onStart(e);
