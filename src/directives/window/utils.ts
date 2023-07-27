@@ -215,9 +215,11 @@ function getOverlayBoundsArr(el: HTMLElement) {
 function getIntersectElements(el: HTMLElement): HTMLElement[] {
   return deDup(
     getInterpolationPoints(el.getBoundingClientRect()).flatMap((item) => {
-      const elements = document.elementsFromPoint(item[0], item[1]);
-      const find = elements.findIndex((item) => item === el);
-      return elements.slice(0, find >= 0 ? find : 0);
+      const elements = document
+        .elementsFromPoint(item[0], item[1])
+        .filter((item) => item === el || !el.contains(item));
+      const findIndex = elements.findIndex((item) => item === el);
+      return elements.slice(0, findIndex >= 0 ? findIndex : 0);
     }),
   );
 }
