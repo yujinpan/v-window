@@ -226,12 +226,26 @@ function deDup(arr: any[]) {
   return Array.from(new Set(arr));
 }
 
-function mergeBoundsArr(boundsArr: Required<Bounds>[]) {
-  return boundsArr.filter((item) =>
-    boundsArr.every(
-      (bounds) => !(item !== bounds && isContainsBounds(bounds, item)),
-    ),
+export function mergeBoundsArr(boundsArr: Required<Bounds>[]) {
+  boundsArr = deDepBoundsArr(boundsArr);
+
+  return boundsArr.filter((item, index, arr) =>
+    arr.every((bounds) => item === bounds || !isContainsBounds(bounds, item)),
   );
+}
+
+function deDepBoundsArr(boundsArr: Required<Bounds>[]) {
+  const result: Required<Bounds>[] = [];
+
+  boundsArr.forEach((item) => {
+    if (
+      result.every((bounds) => JSON.stringify(bounds) !== JSON.stringify(item))
+    ) {
+      result.push(item);
+    }
+  });
+
+  return result;
 }
 
 function isContainsBounds(source: Required<Bounds>, target: Required<Bounds>) {
