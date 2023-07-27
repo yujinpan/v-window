@@ -271,8 +271,8 @@ function isContainsPoint(
 
 function getInterpolationPoints(bounds: Required<Bounds>, distance = 50) {
   const result: number[][] = [];
-  for (let i = bounds.left; i <= bounds.right; i += distance) {
-    for (let j = bounds.top; j <= bounds.bottom; j += distance) {
+  for (let i = bounds.left + 1; i <= bounds.right - 1; i += distance) {
+    for (let j = bounds.top + 1; j <= bounds.bottom - 1; j += distance) {
       result.push([i, j]);
     }
   }
