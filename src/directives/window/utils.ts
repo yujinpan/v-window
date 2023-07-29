@@ -200,15 +200,17 @@ function isInBoundsArr(boundsArr: Required<Bounds>[], e: MouseEvent) {
 }
 
 function getOverlayBoundsArr(el: HTMLElement) {
-  const oldStyle = el.getAttribute('style');
-  el.setAttribute(
+  const clone = el.cloneNode() as HTMLElement;
+  appendToCurrentNode(el, clone);
+  clone.setAttribute(
     'style',
     'position:absolute;top:0;left:0;width:100%;height:100%;',
   );
   const result = mergeBoundsArr(
-    getIntersectElements(el).map((item) => item.getBoundingClientRect()),
+    getIntersectElements(clone).map((item) => item.getBoundingClientRect()),
   );
-  el.setAttribute('style', oldStyle as any);
+  clone.remove();
+
   return result;
 }
 
@@ -279,4 +281,13 @@ function getInterpolationPoints(bounds: Required<Bounds>, distance = 50) {
     }
   }
   return result;
+}
+
+function appendToCurrentNode(currentNode: Node, targetNode: Node) {
+  const nextNode = currentNode.nextSibling;
+  if (nextNode) {
+    currentNode.parentNode?.insertBefore(targetNode, nextNode);
+  } else {
+    currentNode.parentNode?.append(targetNode);
+  }
 }
