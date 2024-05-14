@@ -86,7 +86,7 @@ export function draggable(
         onMove?.(endX - startX, endY - startY, startX, startY);
       });
       const mousemoveListener = (e: MouseEvent) => {
-        options.stop && e.stopPropagation();
+        options.stop !== false && e.stopPropagation();
 
         handleMove(e);
       };
