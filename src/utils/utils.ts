@@ -38,6 +38,7 @@ export type DraggableOptions = {
   onEnd?: (e: MouseEvent) => any;
   getPointerBounds?: (e: MouseEvent) => Bounds;
   boundsTarget?: HTMLElement;
+  stop?: boolean;
 };
 
 export function draggable(
@@ -62,7 +63,7 @@ export function draggable(
 
       const { x: startX, y: startY } = e;
       const bounds = getPointerBounds?.(e) || {};
-      const mousemoveListener = throttle((e: MouseEvent) => {
+      const handleMove = throttle((e: MouseEvent) => {
         // handle move with no overlay
         if (isInBoundsArr(overlayBoundsArr, e)) {
           inOverlay = true;
@@ -84,14 +85,19 @@ export function draggable(
         endY = inRange(endY, top, bottom);
         onMove?.(endX - startX, endY - startY, startX, startY);
       });
+      const mousemoveListener = (e: MouseEvent) => {
+        options.stop && e.stopPropagation();
+
+        handleMove(e);
+      };
       const mouseupListener = (e: MouseEvent) => {
         onEnd && onEnd(e);
         document.body.style.userSelect = '';
         document.removeEventListener('mouseup', mouseupListener);
-        document.removeEventListener('mousemove', mousemoveListener);
+        document.removeEventListener('mousemove', mousemoveListener, true);
       };
       document.addEventListener('mouseup', mouseupListener);
-      document.addEventListener('mousemove', mousemoveListener);
+      document.addEventListener('mousemove', mousemoveListener, true);
     }
   };
   (el as HTMLElement).addEventListener('mousedown', listener);
