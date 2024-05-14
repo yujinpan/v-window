@@ -1,5 +1,5 @@
 import type { DraggableOptions } from './utils';
-import type { Fn } from '../../types';
+import type { Fn } from '../types';
 
 import {
   draggable,
@@ -11,10 +11,29 @@ import {
   throttle,
 } from './utils';
 
+export type ResizeableOptions = {
+  onHover?: Fn;
+  onBlur?: Fn;
+  minWidth?: number;
+  minHeight?: number;
+  maxWidth?: number;
+  maxHeight?: number;
+  getStartState?: (el: HTMLElement) => {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+  setMoveState?: (
+    el: HTMLElement,
+    state: { x: number; y: number; width: number; height: number },
+  ) => void;
+} & DraggableOptions;
+
 export function resizeable(
   el: HTMLElement,
   {
-    canResize,
+    canStart,
     onHover,
     onBlur,
     onStart,
@@ -24,20 +43,17 @@ export function resizeable(
     minHeight,
     maxWidth,
     maxHeight,
-  }: {
-    canResize?: () => boolean;
-    onHover?: Fn;
-    onBlur?: Fn;
-    minWidth?: number;
-    minHeight?: number;
-    maxWidth?: number;
-    maxHeight?: number;
-  } & Partial<
-    Pick<
-      DraggableOptions,
-      'canStart' | 'onStart' | 'onEnd' | 'getPointerBounds'
-    >
-  > = {},
+    getStartState = (el) => {
+      const [x, y] = getTranslateCoordinate(el);
+      const { width, height } = el.getBoundingClientRect();
+      return { x, y, width, height };
+    },
+    setMoveState = (el, { width, height, x, y }) => {
+      el.style.width = width + 'px';
+      el.style.height = height + 'px';
+      setTranslate(el, x, y);
+    },
+  }: ResizeableOptions = {},
 ) {
   const unbinds = [];
   let dragging = false;
@@ -45,7 +61,14 @@ export function resizeable(
 
   // 4条边，4个点的鼠标滑过事件
   const mousemoveListener = throttle((e: MouseEvent) => {
-    if (dragging) return;
+    if (dragging) {
+      return;
+    } else if (canStart ? !canStart(e) : false) {
+      document.body.style.cursor = '';
+      el.style.cursor = '';
+      return;
+    }
+
     const range = getElementRange(el);
     const direction = getDirectionByRange(e, range);
     if (direction !== currentDirection) {
@@ -74,10 +97,16 @@ export function resizeable(
   minWidth = minWidth || 34;
   minHeight = minHeight || 20;
   const unbindDraggable = draggable(document, {
-    canStart: () => !!currentDirection && (canResize ? canResize() : true),
+    canStart: (e) => !!currentDirection && (canStart ? canStart(e) : true),
     onStart: (e) => {
-      const [x, y] = getTranslateCoordinate(el);
-      const { width, height } = el.getBoundingClientRect();
+      const startState = getStartState(el);
+      const { x, y } = startState;
+      let { width, height } = startState;
+      if (!width || !height) {
+        const rect = el.getBoundingClientRect();
+        width = width || rect.width;
+        height = height || rect.height;
+      }
       initX = x;
       initY = y;
       initWidth = width;
@@ -163,9 +192,12 @@ export function resizeable(
           break;
       }
 
-      el.style.width = width + 'px';
-      el.style.height = height + 'px';
-      setTranslate(el, translateX, translateY);
+      setMoveState(el, {
+        x: translateX,
+        y: translateY,
+        width,
+        height,
+      });
     },
     onEnd: (e) => {
       dragging = false;

@@ -1,8 +1,8 @@
 import type { ObjectDirective } from 'vue';
 
-import { movable } from './move';
-import { resizeable, unResizeable } from './resize';
-import { getOptionsByAttrs, getTarget } from './utils';
+import { movable } from '@/utils/move';
+import { resizeable, unResizeable } from '@/utils/resize';
+import { getOptionsByAttrs, getTarget } from '@/utils/utils';
 
 /**
  * Window 窗口化指令
@@ -86,7 +86,7 @@ const Window: ObjectDirective = {
     !modifiers.noMove &&
       movable(target, {
         headerSelector: options.header,
-        canMove: () => !resizing,
+        canStart: () => !resizing,
         getPointerBounds,
       });
   },

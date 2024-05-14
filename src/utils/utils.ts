@@ -1,3 +1,5 @@
+import type { Ref } from 'vue';
+
 import type { Fn, Obj } from '@/types';
 
 export function throttle(fn: Fn & { __throttle__?: any }, time = 0) {
@@ -31,22 +33,28 @@ export type Bounds = {
 
 export type DraggableOptions = {
   canStart?: (e: MouseEvent) => boolean;
-  onStart: (e: MouseEvent) => any;
-  onMove: (x: number, y: number) => void;
+  onStart?: (e: MouseEvent) => any;
+  onMove?: (x: number, y: number, startX: number, startY: number) => void;
   onEnd?: (e: MouseEvent) => any;
   getPointerBounds?: (e: MouseEvent) => Bounds;
-  boundsTarget: HTMLElement;
+  boundsTarget?: HTMLElement;
 };
 
 export function draggable(
   el: HTMLElement | Document,
   options: DraggableOptions,
 ): Fn {
-  const { canStart, onStart, onMove, onEnd, getPointerBounds, boundsTarget } =
-    options;
+  const {
+    canStart,
+    onStart,
+    onMove,
+    onEnd,
+    getPointerBounds,
+    boundsTarget = ('offsetParent' in el ? el : el) as HTMLElement,
+  } = options;
   const listener = (e: MouseEvent) => {
     if (e.button === 0 && (!canStart || canStart(e))) {
-      onStart(e);
+      onStart?.(e);
       document.body.style.userSelect = 'none';
 
       const overlayBoundsArr = getOverlayBoundsArr(boundsTarget);
@@ -74,7 +82,7 @@ export function draggable(
         let { x: endX, y: endY } = e;
         endX = inRange(endX, left, right);
         endY = inRange(endY, top, bottom);
-        onMove(endX - startX, endY - startY);
+        onMove?.(endX - startX, endY - startY, startX, startY);
       });
       const mouseupListener = (e: MouseEvent) => {
         onEnd && onEnd(e);
@@ -146,6 +154,8 @@ export function isPositionBottom(el: HTMLElement) {
   return result;
 }
 
+export type RefLike<T = any> = T | Ref<T>;
+
 function inRange(val: number, min: number, max: number) {
   return val < min ? min : Math.min(val, max);
 }
@@ -176,6 +186,10 @@ export function limitAddVal(
     }
   }
   return add;
+}
+
+export function noop() {
+  // noop
 }
 
 function getOffsetParentRange(el: HTMLElement | undefined, bounds: Bounds) {
