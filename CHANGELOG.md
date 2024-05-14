@@ -1,3 +1,9 @@
+## [2.1.2](https://github.com/yujinpan/v-window/compare/v2.1.1...v2.1.2) (2024-05-14)
+
+### Bug Fixes
+
+- set stop default value to true ([b5bb441](https://github.com/yujinpan/v-window/commit/b5bb4413681e8dd197af818616f2027ea1594657))
+
 ## [2.1.1](https://github.com/yujinpan/v-window/compare/v2.1.0...v2.1.1) (2024-05-14)
 
 ### Bug Fixes
