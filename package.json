@@ -19,12 +19,13 @@
     "modal",
     "dialog"
   ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
   "scripts": {
-    "publish:beta": "npm version prerelease --preid=beta && npm publish --registry=https://registry.npmjs.org",
-    "publish:patch": "npm version patch && npm publish --registry=https://registry.npmjs.org",
-    "publish:major": "npm version major && npm publish --registry=https://registry.npmjs.org",
-    "version": "npm run build",
-    "postversion": "git push --all && git push --tags",
+    "publish:beta": "release-ops beta",
+    "publish:patch": "release-ops patch",
+    "publish:major": "release-ops major",
     "dev": "vite",
     "build": "cross-env NODE_ENV=production rollupx",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
@@ -59,6 +60,7 @@
     "npm-run-all": "^4.1.5",
     "path-ops": "^1.0.0",
     "prettier": "^2.5.1",
+    "release-ops": "^1.0.1",
     "rollup-plugin-vue": "^5.1.9",
     "rollupx": "^3",
     "sass": "^1.54.9",
