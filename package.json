@@ -2,8 +2,8 @@
   "name": "v-window",
   "version": "2.1.2",
   "author": "yujinpan",
-  "main": "lib/index.js",
-  "module": "lib/index.js",
+  "main": "lib/cjs/index.js",
+  "module": "lib/es/index.js",
   "typings": "types/index.d.ts",
   "files": [
     "lib",
