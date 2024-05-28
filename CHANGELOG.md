@@ -1,3 +1,5 @@
+## [2.1.3](https://github.com/yujinpan/v-window/compare/v2.1.2...v2.1.3) (2024-05-28)
+
 ## [2.1.2](https://github.com/yujinpan/v-window/compare/v2.1.1...v2.1.2) (2024-05-14)
 
 ### Bug Fixes

@@ -1,6 +1,6 @@
 {
   "name": "v-window",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "author": "yujinpan",
   "main": "lib/cjs/index.js",
   "module": "lib/es/index.js",
