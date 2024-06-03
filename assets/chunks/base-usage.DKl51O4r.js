@@ -1,0 +1,1 @@
+import{n}from"./theme.DXJcH8LN.js";import"./framework.5VAKVSFz.js";const t={};var a=function(){var e=this,r=e._self._c;return r("div",{directives:[{name:"window",rawName:"v-window"}],staticStyle:{width:"100px",height:"100px","background-color":"orange"}},[e._v(" try to drag and resize me ")])},o=[],s=n(t,a,o,!1,null,null);const d=s.exports;export{d as default};
