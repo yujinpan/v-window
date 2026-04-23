@@ -1,3 +1,9 @@
+## [2.1.5](https://github.com/yujinpan/v-window/compare/v2.1.4...v2.1.5) (2026-04-23)
+
+### Features
+
+- Add the inbounds option to handle parent boundary constraints ([bd49634](https://github.com/yujinpan/v-window/commit/bd49634dab85e466df22dcf1d5dc5a6bad2821d5))
+
 ## [2.1.4](https://github.com/yujinpan/v-window/compare/v2.1.3...v2.1.4) (2024-05-29)
 
 ## [2.1.3](https://github.com/yujinpan/v-window/compare/v2.1.2...v2.1.3) (2024-05-28)
