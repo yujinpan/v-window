@@ -53,6 +53,7 @@ export function resizeable(
       el.style.height = height + 'px';
       setTranslate(el, x, y);
     },
+    inBoundsTarget,
   }: ResizeableOptions = {},
 ) {
   const unbinds = [];
@@ -214,6 +215,7 @@ export function resizeable(
       };
     },
     boundsTarget: el,
+    inBoundsTarget,
   });
   unbinds.push(unbindDraggable);
 

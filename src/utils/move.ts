@@ -27,6 +27,7 @@ export function movable(
     },
     setMoveState = (el, { x, y }) => setTranslate(el, x, y),
     boundsTarget,
+    inBoundsTarget,
   }: MovableOptions = {},
 ) {
   const target = getTarget(el, headerSelector);
@@ -46,5 +47,6 @@ export function movable(
     onEnd,
     getPointerBounds,
     boundsTarget: boundsTarget || el,
+    inBoundsTarget,
   });
 }

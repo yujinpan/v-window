@@ -48,6 +48,7 @@ const Window: ObjectDirective = {
       right: number;
       bottom: number;
       left: number;
+      inbounds: boolean;
     }>(
       el,
       [
@@ -60,6 +61,7 @@ const Window: ObjectDirective = {
         { name: 'right', type: 'number' },
         { name: 'bottom', type: 'number' },
         { name: 'left', type: 'number' },
+        { name: 'inbounds', type: 'boolean' },
       ],
       'window',
     );
@@ -82,12 +84,14 @@ const Window: ObjectDirective = {
         minHeight: options['min-height'],
         maxWidth: options['max-width'],
         maxHeight: options['max-height'],
+        inBoundsTarget: options['inbounds'],
       });
     !modifiers.noMove &&
       movable(target, {
         headerSelector: options.header,
         canStart: () => !resizing,
         getPointerBounds,
+        inBoundsTarget: options['inbounds'],
       });
   },
   unbind(el, { value, modifiers }) {

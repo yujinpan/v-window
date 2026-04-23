@@ -38,6 +38,7 @@ export type DraggableOptions = {
   onEnd?: (e: MouseEvent) => any;
   getPointerBounds?: (e: MouseEvent) => Bounds;
   boundsTarget?: HTMLElement;
+  inBoundsTarget?: boolean;
   stop?: boolean;
 };
 
@@ -52,11 +53,13 @@ export function draggable(
     onEnd,
     getPointerBounds,
     boundsTarget = ('offsetParent' in el ? el : el) as HTMLElement,
+    inBoundsTarget,
   } = options;
   const listener = (e: MouseEvent) => {
     if (e.button === 0 && (!canStart || canStart(e))) {
       onStart?.(e);
       document.body.style.userSelect = 'none';
+      document.body.style.webkitUserSelect = 'none';
 
       const overlayBoundsArr = getOverlayBoundsArr(boundsTarget);
       let inOverlay = false;
@@ -70,7 +73,10 @@ export function draggable(
           return;
         }
 
-        const offsetBounds = getOffsetParentRange(boundsTarget, bounds);
+        const offsetBounds = getOffsetParentRange(
+          inBoundsTarget ? boundsTarget : document.body,
+          bounds,
+        );
 
         // leave overlay must be not out first
         if (inOverlay && !isContainsPoint(offsetBounds, e)) {
@@ -116,12 +122,19 @@ export function setTranslate(el: HTMLElement, x: number, y: number) {
 
 export function getOptionsByAttrs<T extends Obj>(
   el: HTMLElement,
-  names: { name: string; type?: 'string' | 'number' }[],
+  names: { name: string; type?: 'string' | 'number' | 'boolean' }[],
   prefix?: string,
 ): T {
   const options: Obj = {};
   names.forEach(({ name, type = 'string' }) => {
-    const val = el.getAttribute(prefix ? prefix + '-' + name : name);
+    const attributeName = prefix ? prefix + '-' + name : name;
+
+    if (type === 'boolean') {
+      options[name] = el.hasAttribute(attributeName);
+      return;
+    }
+
+    const val = el.getAttribute(attributeName);
 
     if (val) {
       options[name] = type === 'number' ? toNum(val) : val;
@@ -162,8 +175,10 @@ export function isPositionBottom(el: HTMLElement) {
 
 export type RefLike<T = any> = T | Ref<T>;
 
-function inRange(val: number, min: number, max: number) {
-  return val < min ? min : Math.min(val, max);
+function inRange(val: number, min?: number, max?: number) {
+  val = isValidVal(min) ? Math.max(min, val) : val;
+  val = isValidVal(max) ? Math.min(max, val) : val;
+  return val;
 }
 
 function toNum(val: any) {
@@ -272,19 +287,34 @@ function deDepBoundsArr(boundsArr: Required<Bounds>[]) {
   return result;
 }
 
-function isContainsBounds(source: Required<Bounds>, target: Required<Bounds>) {
+function isContainsBounds(source: Bounds, target: Bounds) {
   return (
-    source.top <= target.top &&
-    source.right >= target.right &&
-    source.bottom >= target.bottom &&
-    source.left <= target.left
+    ['top', 'left'].every((key) => {
+      const sourceVal = source[key as keyof Bounds];
+      const targetVal = target[key as keyof Bounds];
+      if (isValidVal(sourceVal) && isValidVal(targetVal)) {
+        return targetVal >= sourceVal;
+      } else {
+        return true;
+      }
+    }) &&
+    ['right', 'bottom'].every((key) => {
+      const sourceVal = source[key as keyof Bounds];
+      const targetVal = target[key as keyof Bounds];
+      if (isValidVal(sourceVal) && isValidVal(targetVal)) {
+        return targetVal <= sourceVal;
+      } else {
+        return true;
+      }
+    })
   );
 }
 
-function isContainsPoint(
-  source: Required<Bounds>,
-  point: { x: number; y: number },
-) {
+function isValidVal<T>(val: T): val is NonNullable<T> {
+  return val === 0 || !!val;
+}
+
+function isContainsPoint(source: Bounds, point: { x: number; y: number }) {
   return isContainsBounds(source, {
     top: point.y,
     right: point.x,
